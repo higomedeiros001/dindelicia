@@ -1,0 +1,148 @@
+<div id="app">
+  <button id="btn-admin-trigger" onclick="verificarAcesso()">⚙️</button>
+
+  <div id="view-cliente">
+    <header id="header-carrossel"></header>
+
+    <div class="categoria-title" style="text-align: center; font-size: 1.8rem; color: var(--primary); text-shadow: 1px 1px 2px rgba(0,0,0,0.1); margin-top: 20px;">🥥 Nossos Sabores</div>
+    
+    <main id="cardapio" class="grid-cardapio"></main>
+
+    <div id="carrinho-bar" onclick="abrirModal()">
+      <div class="cart-info">
+        <span class="badge" id="cart-count">0</span>
+        <span>Ver Sacola</span>
+      </div>
+      <strong id="cart-total">R$ 0,00</strong>
+    </div>
+    
+    <footer style="text-align:center; padding:20px; font-size:0.8rem; color:#aaa;">
+      Desenvolvido por <strong>Higo Medeiros</strong>
+    </footer>
+  </div>
+
+  <div id="view-admin" style="display:none;">
+    <nav class="admin-nav">
+      <div>
+        <h2 style="margin:0;">🛠️ Painel ADM</h2>
+        <small>Dev: Higo Medeiros</small>
+      </div>
+      <button onclick="sairPainel()" class="btn-sair" style="background: #555; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer;">Voltar à Loja</button>
+    </nav>
+
+    <div class="admin-menu-tabs">
+      <button onclick="showTab('tab-gestao')" class="tab-btn active" id="btn-tab-gestao">GESTÃO</button>
+      <button onclick="showTab('tab-relatorios')" class="tab-btn" id="btn-tab-relatorios">RELATÓRIOS</button>
+    </div>
+
+    <div class="admin-body">
+      
+      <div id="tab-gestao" class="tab-content">
+        <section class="admin-card">
+          <h3>🖼️ Banners do Cabeçalho</h3>
+          <div class="form-admin">
+            <input type="text" id="novo-banner" placeholder="Link da imagem">
+            <button onclick="adicionarBanner()" class="btn-primary" style="width:100%">Adicionar Banner</button>
+          </div>
+          <div id="lista-banners-admin"></div>
+        </section>
+
+        <section class="admin-card">
+          <h3>🚚 Taxa de Entrega</h3>
+          <div class="input-inline" style="display:flex; gap:10px;">
+            <input type="number" id="adm-taxa" step="0.50" style="flex:1; padding:10px; border-radius:10px; border:1px solid #ddd;">
+            <button onclick="salvarTaxa()" class="btn-primary">Salvar</button>
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <h3>✨ Novo Produto</h3>
+          <div class="form-admin">
+            <input type="text" id="novo-nome" placeholder="Nome do Sabor">
+            <input type="number" id="novo-preco" placeholder="Preço">
+            <input type="number" id="novo-estoque" placeholder="Qtd Inicial em Estoque">
+            <input type="text" id="nova-foto" placeholder="Link da Foto">
+            <button onclick="adicionarSabor()" class="btn-primary" style="width:100%; margin-top:10px;">Cadastrar</button>
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <h3>📋 Sabores Ativos</h3>
+          <div id="lista-admin"></div>
+        </section>
+      </div>
+
+      <div id="tab-relatorios" class="tab-content" style="display:none;">
+        <section class="admin-card">
+          <h3>📅 Filtrar Período</h3>
+          <div style="display:flex; gap:5px; margin-bottom:10px;">
+            <input type="date" id="filtro-inicio" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
+            <input type="date" id="filtro-fim" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
+          </div>
+          <button onclick="renderRelatorios()" class="btn-primary" style="width:100%">Filtrar Vendas</button>
+        </section>
+
+        <section class="admin-card" style="display:flex; justify-content:space-around; text-align:center; background:var(--dark); color:white;">
+          <div><small>Vendas</small><div id="dash-pedidos" style="font-size:1.5rem; color:var(--secondary); font-weight:bold;">0</div></div>
+          <div><small>Faturamento</small><div id="dash-faturamento" style="font-size:1.5rem; color:var(--secondary); font-weight:bold;">R$ 0,00</div></div>
+        </section>
+
+        <section class="admin-card">
+          <h3>🏆 Sabor Campeão</h3>
+          <div id="sabor-campeao" style="text-align:center; font-weight:bold; font-size:1.2rem; color:var(--primary)">---</div>
+        </section>
+
+        <section class="admin-card">
+          <h3>📜 Últimos Pedidos</h3>
+          <div id="lista-historico" style="font-size:0.8rem;"></div>
+          <button onclick="limparVendas()" style="color:red; background:none; border:none; margin-top:15px; cursor:pointer; font-size:0.7rem;">Zerar Relatórios</button>
+        </section>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="modal-cart" class="modal">
+    <div class="modal-content">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Seu Pedido</h2>
+        <span class="close" onclick="fecharModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span>
+      </div>
+      <div id="lista-itens-carrinho"></div>
+      <button class="btn-voltar" onclick="fecharModal()" style="width:100%; padding:10px; background:none; border:1px solid #ddd; border-radius:10px; margin:10px 0;">+ Adicionar mais itens</button>
+      <div class="resumo-financeiro">
+        <div class="sessao-opcao">
+          <label>📍 Como deseja receber?</label>
+          <select id="metodo-entrega" class="select-estilizado" onchange="atualizarTotais()">
+            <option value="entrega">Entrega em Domicílio</option>
+            <option value="retirada">Retirar no Local</option>
+          </select>
+        </div>
+        <div class="sessao-opcao">
+          <label>💳 Forma de Pagamento:</label>
+          <select id="metodo-pagamento" class="select-estilizado" onchange="alternarPixVisual()">
+            <option value="Pix">Pix (Copia e Cola)</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão de Crédito">Cartão de Crédito</option>
+            <option value="Cartão de Débito">Cartão de Débito</option>
+          </select>
+        </div>
+        <div class="row"><span>Subtotal</span> <span id="sub-val">R$ 0,00</span></div>
+        <div class="row" id="row-taxa"><span>Taxa de Entrega</span> <span id="tax-val">R$ 0,00</span></div>
+        <div class="row total"><span>Total Geral</span> <span id="total-val">R$ 0,00</span></div>
+      </div>
+      <div class="dados-cliente">
+        <input type="text" id="c-nome" placeholder="Seu Nome" class="select-estilizado" style="width:100%; margin-bottom:10px;">
+        <div id="campo-endereco"><input type="text" id="c-end" placeholder="Endereço Completo" class="select-estilizado" style="width:100%; margin-bottom:10px;"></div>
+        <div id="campo-troco" style="display:none;"><input type="text" id="c-troco" placeholder="Troco para quanto?" class="select-estilizado" style="width:100%; margin-bottom:10px;"></div>
+      </div>
+      <div id="area-pix" class="pix-area" style="background:#f0f0f0; padding:15px; border-radius:15px; text-align:center; margin-bottom:15px;">
+        <p>💰 Pagamento via PIX</p>
+        <code id="pix-code" style="word-break: break-all; font-size:0.7rem;"></code>
+        <button onclick="copiarPix()" class="btn-copy" style="display:block; width:100%; margin-top:10px; background:var(--secondary); color:white; border:none; padding:8px; border-radius:8px;">Copiar Código PIX</button>
+      </div>
+      <button class="btn-finalizar" onclick="enviarWhats()" style="width:100%; padding:15px; background:var(--secondary); color:white; border:none; border-radius:15px; font-weight:bold; font-size:1.1rem;">🚀 Finalizar no WhatsApp</button>
+    </div>
+  </div>
+<script type="module" src="script.js"></script>
+</div>
